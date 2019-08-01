@@ -29,20 +29,14 @@ def upload_file():
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			flash('File successfully uploaded')
-			return redirect('/')
+			data_type = request.form.get('type', None)
+			if data_type != None:
+				return redirect('/')
+			else:
+				flash('Please choose data type!')
 		else:
 			flash('Allowed file types are xlsx and xls')
 			return redirect(request.url)
-
-@app.route('/')
-def dropdown_form():
-    return render_template('dropdown.html')
-
-@app.route('/', methods=['GET', 'POST'])
-def get_type():
-    if request.method == 'POST':
-        data_type = request.form.get('type', None)
-        return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)
