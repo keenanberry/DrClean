@@ -36,7 +36,6 @@ def check_submit():
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			flash('File successfully uploaded')
 			return redirect(url_for('model', filename=filename, data=data, n=n))
-			#return render_template('build.html')
 		else:
 			flash('Allowed file types are xlsx and xls')
 			return redirect(request.url)
@@ -44,15 +43,10 @@ def check_submit():
 @app.route('/model/<filename>/<data>/<n>', methods=['GET', 'POST'])
 def model(filename, data, n):
 	if request.method == 'GET':
-		print('Building the model... this may take a minute.')
-		#file = request.files['file']
-		#filename = secure_filename(file.filename)
-		#df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename)))
-		#filename = secure_filename(file.filename)
-		df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-		#n = request.form['neighbors']
-		if data == 'indication':
 
+		df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+		if data == 'indication':
 			from indication_model import get_indication_neighbors
 			
 			clean = df.loc[df.Indication.notnull()].copy()
