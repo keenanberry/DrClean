@@ -7,8 +7,8 @@
     <title>KantarClean</title>
 </head>
 <body>
-  <h1>Welcome to KantarClean!</h1>
-  <p><pre>&nbsp; > Use this tool to get label recommendations for unclean database entries.</pre></p><br>
+  <h2>Welcome to KantarClean!</h2>
+  <p>Use this tool to get label recommendations for unclean database entries.</p><br>
   <h3>Select a file to upload</h3>
   <form method="POST" action="/" enctype="multipart/form-data">
       <p>
@@ -16,7 +16,7 @@
       </p>
       <h3>Select the file type</h3>
       <p>
-        <select id="mySelect" name = "type">
+        <select id="mySelect" name = "mySelect">
             <option value="indication">Indication</option>
             <option value="drug">Drug</option>
         </select>
@@ -25,7 +25,7 @@
         (Recommend n=3 for Drug data and n=5 for Indication data)
       </p>
       <p>
-          Neighbors = <input type="number" name="neighbors">
+          Neighbors = <input type="number" name="number">
       </p>
     <p>
       <input type="submit" value="Submit">
