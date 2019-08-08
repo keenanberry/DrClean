@@ -1,16 +1,17 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Header from './components/Header'
-import PageButton from './components/PageButton'
-import TextFields from './components/TextField'
-//import Home from './components/Home'
+//import Buttons from './components/Buttons'
+//import TextFields from './components/TextFields'
+import Upload from './components/Upload'
 
-class App extends Component {
+class App extends React.Component {
   render() {
     return (
       <div>
         <Header title="Upload"/>
-        <PageButton text="Upload" />
-        <TextFields />
+        {/* <Buttons text="Upload" />
+        <TextFields /> */}
+        <Upload />
       </div>
     ); 
   }
