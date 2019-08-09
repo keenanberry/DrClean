@@ -1,17 +1,17 @@
-import React from 'react'
+import React, { Component } from 'react'
 import Header from './components/Header'
-//import Buttons from './components/Buttons'
-//import TextFields from './components/TextFields'
-import Upload from './components/Upload'
+import UploadCard from './components/UploadCard'
+import DownloadCard from './components/DownloadCard'
+import SimpleTable from './components/RecommendationTable'
 
-class App extends React.Component {
+class App extends Component {
   render() {
     return (
       <div>
-        <Header title="Upload"/>
-        {/* <Buttons text="Upload" />
-        <TextFields /> */}
-        <Upload />
+        <Header/>
+        <SimpleTable />
+        {/* <UploadCard />
+        <DownloadCard /> */}
       </div>
     ); 
   }
