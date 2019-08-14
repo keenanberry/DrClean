@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     outlineColor: theme.palette.primary.main,
   },
   head: {
-    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.main,
   },
   button: {
     margin: theme.spacing('1'),
@@ -46,13 +46,13 @@ export default function UploadCard() {
     >
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBttom variant="h5" component="h2">Download</Typography>
+          <Typography gutterBttom variant="h5" component="h2" className={classes.head}><strong>Download</strong></Typography>
           <Typography variant="subtitle1" color="textSecondary" gutterBottom>
             Success! Your file has been written. 
           </Typography>
           <p>filename_QCed.xlsx</p>
-          <Button variant="contained" color="primary" fullWidth={true} className={useStyles.button}>
-            <ArrowDownwardIcon className={useStyles.rightIcon} />
+          <Button variant="contained" color="primary" fullWidth={true} className={classes.button}>
+            <ArrowDownwardIcon className={classes.leftIcon} />
               &nbsp; Download
           </Button>
         </CardContent>

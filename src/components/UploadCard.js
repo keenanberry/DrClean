@@ -14,16 +14,13 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   card: {
-    maxWidth: "800px",
+    maxWidth: "600px",
     //textAlign: 'center',
     justifyContent: 'center',
     alignContent: 'center',
     padding: 20,
     margin: 100,
     borderColor: theme.palette.primary.main,
-  },
-  pos: {
-    marginBottom: 12,
   },
   head: {
     color: theme.palette.primary.main,
@@ -42,12 +39,9 @@ export default function UploadCard() {
     >
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBttom variant="h5" component="h2" className={classes.head}><strong>Upload</strong></Typography>
-          <Typography variant="subtitle1" color="textSecondary" backgroundColor="primary" gutterBottom>
+          <Typography gutterBottom variant="h5" component="h2" className={classes.head}><strong>Upload</strong></Typography>
+          <Typography variant="subtitle1" color="textSecondary" gutterBottom>
             Please upload your file.
-          </Typography>
-          <Typography>
-            &nbsp;
           </Typography>
           <UploadForm />
         </CardContent>
