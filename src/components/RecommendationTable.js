@@ -33,14 +33,12 @@ function createData(id, support, tumor, subtype) {
   return { id, support, tumor, subtype };
 }
 
-const headerRow = ['Existing Database Entries', 'Tumor Type', 'Tumor Subtype']; 
-
-const metaData = {
-  condition: 'Acute Lymphoblastic Leukemia (ALL) and Lymphoblastic Lymphoma',
-  condNumber: '(1 of 256)',
-  label: 'ALL',
-  labelNumber: '(1 of 7)'
-}
+// const metaData = {
+//   condition: 'Acute Lymphoblastic Leukemia (ALL) and Lymphoblastic Lymphoma',
+//   condNumber: '(1 of 256)',
+//   label: 'ALL',
+//   labelNumber: '(1 of 7)'
+// }
 
 const rows = [
   createData(0, ['Acute Lymphoblastic Leukemia (ALL)/T Lymphoblastic Lymphoma',
@@ -66,6 +64,29 @@ const rows = [
     />
   )
 ];
+
+
+const inputData = {
+  'entry': 'Acute Lymphoblastic Leukemia (ALL) and Lymphoblastic Lymphoma',
+  'globalCount': 'Condition (1 of 286)',
+  'labelCount': '(1 of 1)',
+  'details': [{
+    'label': 'ALL',
+    'sublabel': '',
+    'support': ['1) Acute Lymphoblastic Leukemia2) Lymphoblastic Lymphoma',
+     'Acute Lymphoblastic Leukemia (ALL)/T Lymphoblastic Lymphoma',
+     'Acute Lymphoblastic Leukemia and Lymphoblastic Lymphoma',
+     'Acute Lymphoblastic Leukemia/Lymphoma'],
+    'score': 2.220446049250313e-16,
+    'len': 4,
+    'id': 0},
+   {'label': 'Lymphoma',
+    'sublabel': '',
+    'support': ['Lymphoma, Acute Lymphoblastic Leukemia'],
+    'score': 0.05508881747693195,
+    'len': 1,
+    'id': 1}]
+  }
 
 
 const useStyles = makeStyles(theme => ({
@@ -104,6 +125,17 @@ export default function RecommendationTable() {
   const classes = useStyles();
   const [selected, setSelected] = React.useState([]);
 
+  let headerRow = []
+  if (inputData['globalCount'].startsWith('Condition')) {
+    headerRow = ['Existing Database Entries', 'Tumor Type', 'Tumor Subtype']; 
+  }
+  if (inputData['globalCount'].startsWith('Intervention')) {
+    headerRow = ['Existing Database Entries', 'Drug Type', 'Drug Search Terms']; 
+  }
+
+  // let newRows = {{inputData['details']}.map(detail => 
+  //   createData(detail['id'], detail['support'], detail['label'], detail['sublabel']))}
+
   // const [cleaned, setCleaned] = React.useState({
   //   condition: metaData['condition'],
   //   tumor: '',
@@ -135,7 +167,7 @@ export default function RecommendationTable() {
     />,
     <TextField
       id="outlined-dense"
-      label="Enter tumor subtype"
+      label="Enter tumor type"
       className={clsx(useStyles.textField, useStyles.dense)}
       margin="dense"
       variant="outlined"
@@ -197,11 +229,11 @@ export default function RecommendationTable() {
     alignItems="center"
     >
       <Paper className={classes.root}>
-      <Typography variant="h5" component="h2">Condition {metaData.condNumber}</Typography>
+      <Typography variant="h5" component="h2">{inputData.globalCount}</Typography>
       <Divider />
       <Typography>&nbsp;</Typography>
-      <Typography variant="h6" component="h2">Possible <strong>{metaData.label}</strong> {metaData.labelNumber} : </Typography>
-      <Typography variant="h6" component="h2" className={classes.head}><strong>{metaData.condition}</strong>
+      <Typography variant="h6" component="h2">Possible <strong>{inputData.details[0].label}</strong> {inputData.labelCount} : </Typography>
+      <Typography variant="h6" component="h2" className={classes.head}><strong>{inputData.entry}</strong>
       {/* <Button variant="contained" component="span" className={classes.button}>
         Duplicate
       </Button> */}
