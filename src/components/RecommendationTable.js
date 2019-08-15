@@ -135,7 +135,7 @@ export default function RecommendationTable() {
     />,
     <TextField
       id="outlined-dense"
-      label="Enter tumor type"
+      label="Enter tumor subtype"
       className={clsx(useStyles.textField, useStyles.dense)}
       margin="dense"
       variant="outlined"
