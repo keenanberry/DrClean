@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import PropTypes from 'prop-types';
+import IntegrationAutosuggest from './AutosuggestFields';
 // autosuggest options (https://material-ui.com/components/autocomplete/)
 
 const StyledTableCell = withStyles(theme => ({
@@ -29,8 +30,8 @@ const StyledTableCell = withStyles(theme => ({
 }))(TableCell);
 
 
-function createData(id, support, tumor, subtype) {
-  return { id, support, tumor, subtype };
+function createData(id, support, label, sublabel) {
+  return { id, support, label, sublabel };
 }
 
 // const metaData = {
@@ -40,30 +41,30 @@ function createData(id, support, tumor, subtype) {
 //   labelNumber: '(1 of 7)'
 // }
 
-const rows = [
-  createData(0, ['Acute Lymphoblastic Leukemia (ALL)/T Lymphoblastic Lymphoma',
-  '1)Acute Lymphoblastic Leukemia2) Lymphoblastic Lymphoma',
-  'Acute Lymphoblastic Leukemia and Lymphoblastic Lymphoma'], 
-  'ALL', ''),
-  createData(1, ['Acute Lymphoblastic Lymphoma'], 'Lymphoma', 'B-Cell Lymphoma'),
-  createData(2, ['Lymphoma, Acute Lymphoblastic Leukemia'], 'Lymphoma', ''),
-  createData(3, [<strong>Other</strong>],
-    <TextField
-      id="outlined-dense"
-      label="Enter tumor type"
-      //className={clsx(useStyles.textField, useStyles.dense)}
-      margin="dense"
-      variant="outlined"                  
-    />,
-    <TextField
-      id="outlined-dense"
-      label="Enter tumor type"
-      //className={clsx(useStyles.textField, useStyles.dense)}
-      margin="dense"
-      variant="outlined"                  
-    />
-  )
-];
+// const rows = [
+//   createData(0, ['Acute Lymphoblastic Leukemia (ALL)/T Lymphoblastic Lymphoma',
+//   '1)Acute Lymphoblastic Leukemia2) Lymphoblastic Lymphoma',
+//   'Acute Lymphoblastic Leukemia and Lymphoblastic Lymphoma'], 
+//   'ALL', ''),
+//   createData(1, ['Acute Lymphoblastic Lymphoma'], 'Lymphoma', 'B-Cell Lymphoma'),
+//   createData(2, ['Lymphoma, Acute Lymphoblastic Leukemia'], 'Lymphoma', ''),
+//   createData(3, [<strong>Other</strong>],
+//     <TextField
+//       id="outlined-dense"
+//       label="Enter tumor type"
+//       //className={clsx(useStyles.textField, useStyles.dense)}
+//       margin="dense"
+//       variant="outlined"                  
+//     />,
+//     <TextField
+//       id="outlined-dense"
+//       label="Enter tumor type"
+//       //className={clsx(useStyles.textField, useStyles.dense)}
+//       margin="dense"
+//       variant="outlined"                  
+//     />
+//   )
+// ];
 
 
 const inputData = {
@@ -94,9 +95,13 @@ const useStyles = makeStyles(theme => ({
     width: '80%',
     marginTop: theme.spacing(3),
     overflowX: 'auto',
+    height: 800
   },
   table: {
     minWidth: 650,
+  },
+  auto: {
+    verticalAlign: 'top',
   },
   head: {
     color: theme.palette.primary.main,
@@ -118,18 +123,31 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: 'orange',
     color: theme.palette.common.white,
   },
+  other: {
+    fontWeight: 'bold',
+  }, 
 }));
 
 
 export default function RecommendationTable() {
   const classes = useStyles();
+  const rows = inputData.details
   const [selected, setSelected] = React.useState([]);
+  const [outputData, setOutputData] = React.useState([])
+
+  const textFieldRow = createData(
+    rows.length, 
+    ["Other"],
+    <IntegrationAutosuggest />,
+    <IntegrationAutosuggest />,
+  )
+  const textFieldRows = [textFieldRow]
+
 
   let headerRow = []
   if (inputData['globalCount'].startsWith('Condition')) {
     headerRow = ['Existing Database Entries', 'Tumor Type', 'Tumor Subtype']; 
-  }
-  if (inputData['globalCount'].startsWith('Intervention')) {
+  } else if (inputData['globalCount'].startsWith('Intervention')) {
     headerRow = ['Existing Database Entries', 'Drug Type', 'Drug Search Terms']; 
   }
 
@@ -155,34 +173,14 @@ export default function RecommendationTable() {
 
   // }
 
-  const otherRow = createData(rows.length, [<strong>Other</strong>],
-    <TextField
-      id="outlined-dense"
-      label="Enter tumor type"
-      className={clsx(useStyles.textField, useStyles.dense)}
-      margin="dense"
-      variant="outlined"
-      //onClick must be added as well
-      onChange={event => handleClick(event, rows.length, 'tumor')}                 
-    />,
-    <TextField
-      id="outlined-dense"
-      label="Enter tumor type"
-      className={clsx(useStyles.textField, useStyles.dense)}
-      margin="dense"
-      variant="outlined"
-      onChange={event => handleClick(event, rows.length, 'subtype')}                   
-    />
-  )
+  // function pushRows(e) {
+  //   const pushedIndex = rows.length
+  //   let newPushed = [];
+  //   rows.push(otherRow)
+  //   newPushed = newPushed.concat(selected, pushedIndex)
 
-  function pushRows(e) {
-    const pushedIndex = rows.length
-    let newPushed = [];
-    rows.push(otherRow)
-    newPushed = newPushed.concat(selected, pushedIndex)
-
-    setSelected(newPushed);
-  }
+  //   setSelected(newPushed);
+  // }
 
   function handleClick(event, id) {
     const selectedIndex = selected.indexOf(id);
@@ -212,7 +210,6 @@ export default function RecommendationTable() {
   function handleSubmit(event) {
     event.preventDefault()
     if(selected.length) {
-      //const cleanedEntries = selected.map((row) => rows[row].tumor)
       console.log(selected)
     }else {
       alert('You must make a selection.')
@@ -273,8 +270,8 @@ export default function RecommendationTable() {
                         </TableBody>
                       </Table>
                     </TableCell>
-                    <TableCell align="left">{row.tumor}</TableCell>
-                    <TableCell align="left">{row.subtype}</TableCell>
+                    <TableCell align="left">{row.label}</TableCell>
+                    <TableCell align="left">{row.sublabel}</TableCell>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isItemSelected}
@@ -283,6 +280,20 @@ export default function RecommendationTable() {
                   </TableRow>
                 );
             })}
+            <TableRow>
+              <TableCell scope="row" className={classes.other}>
+                {textFieldRows[0].support}
+              </TableCell>
+              <TableCell>
+                {textFieldRows[0].label}
+              </TableCell>
+              <TableCell>
+                {textFieldRows[0].sublabel}
+              </TableCell >
+              <TableCell padding="checkbox">
+                <Checkbox/>
+              </TableCell>
+            </TableRow>
           </TableBody>
           <TableFooter>
             <TableRow>
@@ -290,7 +301,7 @@ export default function RecommendationTable() {
                 <Button variant="contained" component="span" className={classes.foot}>
                   Back
                 </Button>
-                <Button variant="contained" component="span" className={classes.button} onClick={pushRows}>
+                <Button variant="contained" component="span" className={classes.button}>
                   Add Other
                 </Button>
               </TableCell>
