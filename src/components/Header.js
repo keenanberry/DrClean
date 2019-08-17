@@ -5,7 +5,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
-import Button from "@material-ui/core/Button"; 
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
+import ToggleButton from "@material-ui/lab/ToggleButton"; 
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -19,19 +20,31 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Header() {
-  const classes = useStyles(); 
-  const [uploadButtonState, setUploadButtonState] = useState("primary");
-  const [labelButtonState, setLabelButtonState] = useState("primary");
-  const [downloadButtonState, setDownloadButtonState] = useState("primary");
+export default function Header(props) {
+  const classes = useStyles();
 
-  function enforceButtonSelection(setter) {
-    [setUploadButtonState, setLabelButtonState, setDownloadButtonState].forEach(fn => { fn("primary"); });
-    setter("secondary");
-  } 
-  // 1. clear selection of buttons
-  // 2. apply selection of buttons to one clicked
-  // 3. activate the components that are part of that screen
+  function handleSetToUploadStep() {
+    if (props.currentWorkflowStep > 0) {
+      props.setCurrentWorkflowStep(0);
+    }
+  }
+
+  function handleSetToLabelStep() {
+    if (props.currentWorkflowStep === 0) {
+      alert('Cannot Proceed to Label Step Until a File is Uploaded!');
+    }
+
+    if (props.currentWorkflowStep === 2) {
+      props.setCurrentWorkflowStep(1);
+    }
+  }
+
+  function handleSetToDownloadStep() {
+    if (props.currentWorkflowStep < 2) {
+      alert('Cannot Proceed to Download Step Until a File is Uploaded and Entries are Labeled!');
+    }
+  }
+
   return (
     <div className={classes.root}>
     <AppBar position="static">
@@ -47,9 +60,11 @@ export default function Header() {
         <Typography align="left" variant="h6" className={classes.title}>
           KantarClean
         </Typography>
-        <Button variant="contained" color={uploadButtonState} onClick={enforceButtonSelection.bind(null, setUploadButtonState)}>Upload</Button> 
-        <Button variant="contained" color={labelButtonState} onClick={enforceButtonSelection.bind(null, setLabelButtonState)}>Label</Button> 
-        <Button variant="contained" color={downloadButtonState} onClick={enforceButtonSelection.bind(null, setDownloadButtonState)}>Download</Button> 
+        <ToggleButtonGroup>
+          <ToggleButton variant="contained" selected={props.currentWorkflowStep === 0} onClick={handleSetToUploadStep}>Step 1. Upload File</ToggleButton> 
+          <ToggleButton variant="contained" selected={props.currentWorkflowStep === 1} onClick={handleSetToLabelStep}>Step 2. Label Entries</ToggleButton> 
+          <ToggleButton variant="contained" selected={props.currentWorkflowStep === 2} onClick={handleSetToDownloadStep}>Step 3. Download File</ToggleButton> 
+        </ToggleButtonGroup>
       </Toolbar>
     </AppBar>
   </div>

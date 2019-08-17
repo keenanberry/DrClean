@@ -15,7 +15,6 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     maxWidth: "600px",
-    //textAlign: 'center',
     justifyContent: 'center',
     alignContent: 'center',
     padding: 20,
