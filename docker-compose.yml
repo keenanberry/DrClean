@@ -7,7 +7,7 @@ services:
       context: ./ui
       dockerfile: Dockerfile
     volumes:
-      - '.:/app'
+      - './ui:/app'
       - '/app/node_modules'
     ports:
       - '3000:3000'
@@ -20,9 +20,9 @@ services:
       context: ./api
       dockerfile: Dockerfile
     volumes:
-      - '.:/app'
+      - './api:/app'
       - '/app/node_modules'
     ports:
       - '5000:5000'
-    environment:
+    # environment:
       # Any Python environment variables go here
