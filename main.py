@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 import operator
 from collections import Counter
+import get_recommendation_dict from formatter
 
 ALLOWED_EXTENSIONS = set(['xlsx', 'xls'])
 
@@ -45,32 +46,22 @@ def model(filename, data, n):
 	if request.method == 'GET':
 
 		df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+		clean = df.loc[df.Indication.notnull()]
+		unclean = df.loc[df.Indication.isnull()]
+
+		colnames = list(clean.columns)
+		coltype = None
+		neighborhood = None
 
 		if data == 'indication':
-			from indication_model import get_indication_neighbors
+			from indication_model import get_indication_dictionary
 			
-			clean = df.loc[df.Indication.notnull()].copy()
-			unclean = df.loc[df.Indication.isnull()].copy()
+			coltype = 'Tumor'
+			neighborhood = get_indication_neighbors(clean, unclean, int(n))
+		else if data == 'drug':
+			print('do something else')
 
-			neighborhood = get_indication_neighbors(clean.copy(), unclean.copy(), int(n))
-			distances = neighborhood[0]
-			neighbors = neighborhood[1]
-
-			clean.fillna('',inplace=True)
-			clean.reset_index(inplace=True)
-			clean.drop(columns='index', inplace=True)
-
-			label0 = list(clean.loc[neighbors.tolist()[0], 'Indication'])
-			sortedVotes = sorted(Counter(label0).items(), key=operator.itemgetter(1), reverse=True)
-			return render_template('success.html', indication=sortedVotes[0][0])
-
-		# elif request.form['type'] == 'drug':
-		# 	from drug_model import get_drug_neighbors
-
-		# 	clean = df.loc[df.Drug.notnull()].copy()
-		# 	unclean = df.loc[df.Drug.isnull()].copy()
-
-		# 	neighbors = get_drug_neighbors(clean, unclean, n)
+		recommendations = get_recommendation_dict(clean, unclean, neighborhood, coltype)
 
 
 if __name__ == "__main__":

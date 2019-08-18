@@ -39,15 +39,11 @@ def process_unclean_indication(unclean_data):
 
 
 def get_indication_neighbors(clean, unclean, neighbors):
-    clean = process_clean_indication(clean)
-    unclean = process_unclean_indication(unclean)
-
-    #encoder = preprocessing.LabelEncoder()
-    #encoder.fit(clean['Indication'])
-    #y_train = encoder.transform(clean['Indication'])
+    cleancopy = process_clean_indication(clean.copy())
+    uncleancopy = process_unclean_indication(unclean.copy())
     
-    X_train = list(clean['Condition'])
-    X_test = list(unclean['Condition'])
+    X_train = list(cleancopy['Condition'])
+    X_test = list(uncleancopy['Condition'])
 
     # build and train model
     cv = CountVectorizer(analyzer='word', max_df = 0.40, min_df = 1, ngram_range=(1,1), stop_words = 'english')
@@ -59,3 +55,4 @@ def get_indication_neighbors(clean, unclean, neighbors):
     neighborhood = nn.kneighbors(test_vector, return_distance=True)
 
     return(neighborhood)
+    
