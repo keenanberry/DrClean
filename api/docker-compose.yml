@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  kantar-clean-api:
+    container_name: kantar-clean-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+    ports:
+      - '5000:5000'
+    # environment:
+      # Any Python environment variables go here

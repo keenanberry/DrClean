@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  kantar-clean-ui:
+    container_name: kantar-clean-ui
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    volumes:
+      - './ui:/app'
+      - '/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+  kantar-clean-api:
+    container_name: kantar-clean-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - './api:/app'
+      - '/app/node_modules'
+    ports:
+      - '5000:5000'
+    # environment:
+      # Any Python environment variables go here
