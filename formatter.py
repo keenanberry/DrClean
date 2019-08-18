@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import string
 
 def get_recommendation_dict(clean, unclean, neighborhood, coltype):
     distances = neighborhood[0]
