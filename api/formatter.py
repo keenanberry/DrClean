@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import string
 
-def get_recommendation_dict(clean, unclean, neighborhood, coltype):
+def get_recommendation_dict(clean, unclean, neighborhood):
     distances = neighborhood[0]
     neighbors = neighborhood[1]
 
@@ -10,26 +10,25 @@ def get_recommendation_dict(clean, unclean, neighborhood, coltype):
     clean.drop(columns='index', inplace=True)
     clean.fillna('',inplace=True)
 
-    clean.columns = ['support', 'label', 'sublabel']
-    unclean.columns = ['entry', 'label', 'sublabel']
+    clean.columns = ['support', 'type', 'subtype']
+    unclean.columns = ['entry', 'type', 'subtype']
 
     data = dict()
     for n in range(len(neighbors)):
-        tmp = clean.loc[neighbors[n], ['support','label', 'sublabel']]
+        tmp = clean.loc[neighbors[n], ['support','type', 'subtype']]
         tmp['score'] = distances[n]
-        tmp = tmp.groupby(['label', 'sublabel']).agg({'support': lambda x: list(x), 'score': 'min'}).reset_index()
+        tmp = tmp.groupby(['type', 'subtype']).agg({'support': lambda x: list(x), 'score': 'min'}).reset_index()
         tmp['len'] = tmp['support'].str.len()
         tmp.sort_values(by='len', ascending=False, inplace=True)
-        #tmp['id'] = tmp.index
         data[unclean['entry'][n]] = tmp.to_dict('records')
 
-    sorted_data = sorted(data.items(), key=lambda x: (x[1][0]['label'], x[1][0]['score']))
+    sorted_data = sorted(data.items(), key=lambda x: (x[1][0]['type'], x[1][0]['score']))
     
     uncleanEntries = list()
     labelFrequencies = dict()
 
     for entry in sorted_data:
-        possible_label = entry[1][0]['label'].lower()
+        possible_label = entry[1][0]['type'].lower()
         if possible_label in labelFrequencies:
             labelFrequencies[possible_label] += 1
         else:
@@ -39,9 +38,8 @@ def get_recommendation_dict(clean, unclean, neighborhood, coltype):
         uncleanEntries.append(entry_dict)
 
     final_dict = {
-        'columnType': coltype,
         'primaryLabelFrequency': labelFrequencies,
-        'uncleanEntries': uncleanEntries
+        'conditions': uncleanEntries,
     }
 
     return final_dict

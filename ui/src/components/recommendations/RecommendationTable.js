@@ -22,18 +22,29 @@ function makeRowsFromDetails(raw) {
   });
 }
 
+function oneRowIsSelected(rows) {
+  let oneIsSelected = false; 
+  rows.forEach(row => { oneIsSelected = row.details.isSelected || oneIsSelected; } );
+  return oneIsSelected;
+}
+
 export default function RecommendationTable(props) {
   const classes = useStyles();
   const [rows, setRows] = useState(makeRowsFromDetails(props.conditions[props.conditionIndex].details));
 
   function handleNext(event) {
-    props.conditions[props.conditionIndex].details = rows.map(row => row.details);
-    setRows(makeRowsFromDetails(props.conditions[props.conditionIndex + 1].details));
-    props.setConditionIndex(props.conditionIndex + 1);
+    if (oneRowIsSelected(rows)) {
+      props.conditions[props.conditionIndex].details = rows.map(row => row.details);
+      setRows(makeRowsFromDetails(props.conditions[props.conditionIndex + 1].details));
+      props.setConditionIndex(props.conditionIndex + 1);
+    }else {
+      alert('You must make a selection!')
+    }
   }
 
   function handleFinish(event) {
     props.conditions[props.conditionIndex].details = rows.map(row => row.details);
+    // setIsFinishedLabeling props?
     console.log(JSON.stringify(props.conditions, false, 2));
   }
 
