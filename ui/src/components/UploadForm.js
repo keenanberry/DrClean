@@ -6,6 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 //import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 //import NavigationIcon from '@material-ui/icons/Navigation';
+import axios from 'axios';
 
 const dataTypes = [
     {
@@ -32,78 +33,84 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function UploadForm() {
+//export default function UploadForm({ payload, setConditions, setColumnType, setHasUploadedFile }) {
+export default function UploadForm({ payload, setHasUploadedFile }) {
   const classes = useStyles();
   const fileInput = React.createRef();
-  const [values, setValues] = React.useState({
-    file: null,
-    data: '',
-    number: '',
+
+  const [textValues, setTextValues] = React.useState({
+    tasktype: '',
+    numneighbors: '',
   });
 
-  // functions to handle state changes
-  // file must end in .xlsx or .xls
-  // data must be selected (1 of 2 options)
-  // number must be between 1 and 50
-  // with all in check the submit button can go ahead and send inputs to store
-    // file will be saved in public/uploads
-
-  const handleChange = name => event => {
-    setValues({ ...values, [name]: event.target.value });
+  const handleInputChange = name => event => {
+    setTextValues({ ...textValues, [name]: event.target.value });
   };
 
-  // onSubmit should trigger the input event
-  // something like this...
+  function handleUpload(event) {
+    event.preventDefault();
 
-  // e.preventDefault();
-  // let file= values['file']
-  // console.warn('this is the file:', file)
-  // let reader= new FileReader();
-  // reader.readAsDataURL(file);
+    if (fileInput.current.files[0]) {
+      var queryString = Object.keys(textValues)
+        .map(key => key + '=' + textValues[key])
+        .join('&');
 
-  // reader.onload= (e) => {
-  //   console.warn("binary data: ", reader.result)
-  // }
+      const url = `http://localhost:5000/api/upload?${queryString}`;
 
-  function handleSubmit() {
-    if (values['file']) {
-      values['file'] = fileInput.current.files[0];
-      
-      console.log(values)
-      alert('File submitted!')
-  
-      fetch('http://localhost:3000/upload', {
+      const data = new FormData();
+      data.append('file', fileInput.current.files[0]);
+
+      fetch(url, {
         method: 'POST',
-        body: values,
-      }) 
-      // }).then((response) => {
-      //   response.json().then((body) => {
-
-      //   })
-      // })
-    } else {
-      alert('Please upload a file!')
+        body: data,
+      }).then(response => {
+          return response.text();
+        })
+        .then((response) => {
+          let responseJson = JSON.parse(response);
+          //console.log(responseJson);
+          //setConditions(responseJson.conditions);
+          //setColumnType(responseJson.columnType);
+          payload.conditions = responseJson.conditions;
+          payload.columnType = responseJson.columnType;
+          payload.columnHead = responseJson.columnHead;
+          payload.primaryLabelFrequency = responseJson.primaryLabelFrequency;
+          payload.filename = responseJson.filename;
+          setHasUploadedFile();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }else {
+      alert('Please upload your file!');
     }
-  }
+      // option 2 uses FileReader() ... doesn't work
+      // let files = fileInput.current.files;
+      // let reader = new FileReader();
+      // reader.readAsBinaryString(files[0]);
 
-  // clear form on click and on enter
-  // pass input values to store on click and on enter
-  // save uploaded file on click and on enter
-      // should I use fetch or axios
+      // reader.onload = (e) => {
+      //   console.log(e.target.result)
+      //   const url = `http://localhost:5000/api/upload?${queryString}`;
+      //   console.log(url)
+      //   const body={file:e.target.result}
+      //   return axios.post(url, body)
+      //     .then(response => console.log('SUCCESS!'))
+      //     .catch(response => console.log('FAIL!'))
+      // }
+
+    
+  }
 
   return (
     <form id="upload-form" className={classes.container} noValidate autoComplete="off">
       <div className="container">
         <div  className="row">
           <Button variant="contained" component="label" color="default" className={useStyles.button}>
-            {/* Upload &nbsp;
-            <CloudUploadIcon className={useStyles.rightIcon} /> */}
             <input
               type="file"
               ref={fileInput}
               accept=".xlsx,.xls"
-              onChange={handleChange('file')}
-              // style={{ display: "None" }}
             />
           </Button>
         </div>
@@ -118,8 +125,8 @@ export default function UploadForm() {
             select
             label="Select"
             className={classes.textField}
-            value={values.data}
-            onChange={handleChange('data')}
+            value={textValues.tasktype}
+            onChange={handleInputChange('tasktype')}
             SelectProps={{
               MenuProps: {
                 className: classes.menu,
@@ -138,8 +145,8 @@ export default function UploadForm() {
           <TextField
             id="outlined-number"
             label="Number"
-            value={values.number}
-            onChange={handleChange('number')}
+            value={textValues.numneighbors}
+            onChange={handleInputChange('numneighbors')}
             type="number"
             className={classes.textField}
             InputLabelProps={{
@@ -151,7 +158,7 @@ export default function UploadForm() {
           />
         </div>
         <div className="row">
-          <Button form="upload-form" type="submit" variant="contained" color="primary" fullWidth={true} onClick={handleSubmit}>
+          <Button form="upload-form" type="submit" variant="contained" color="primary" fullWidth={true} onClick={handleUpload}>
             Submit
           </Button>
         </div>

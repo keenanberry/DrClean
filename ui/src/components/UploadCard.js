@@ -26,7 +26,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function UploadCard() {
+//export default function UploadCard({ payload, setConditions, setColumnType, setHasUploadedFile }) {
+export default function UploadCard({ payload, setHasUploadedFile }) {
+
   const classes = useStyles();
 
   return (
@@ -42,7 +44,12 @@ export default function UploadCard() {
           <Typography variant="subtitle1" color="textSecondary" gutterBottom>
             Please upload your file.
           </Typography>
-          <UploadForm />
+          <UploadForm 
+            payload={payload}
+            setHasUploadedFile={setHasUploadedFile}
+            //setConditions={setConditions}
+            //setColumnType={setColumnType}
+          />
         </CardContent>
       </Card>
     </Grid>

@@ -1,68 +1,102 @@
 import os, sys
 import urllib.request
-from app import app
-from flask import Flask, flash, request, redirect, render_template, url_for
+from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 import pandas as pd
 import operator
+import json
+import logging
+from io import BytesIO
 from collections import Counter
-import get_recommendation_dict from formatter
+from formatter import get_recommendation_dict
 
+UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = set(['xlsx', 'xls'])
+
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/')
-def index():
-	return render_template('index.html')
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+	
+	task_type = request.args.get('tasktype')
+	num_neighbors = request.args.get('numneighbors')
 
-@app.route('/', methods=['GET', 'POST'])
-def check_submit():
-	if request.method == 'POST':
-        # check if the post request has the file part
-		if 'file' not in request.files:
-			flash('No file part')
-			return redirect(request.url)
-		file = request.files['file']
-		n = request.form['number']
-		if n == '':
-			n = '5'
-		data = request.form['mySelect']
-		if file.filename == '':
-			flash('No file selected for uploading')
-			return redirect(request.url)
-		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			flash('File successfully uploaded')
-			return redirect(url_for('model', filename=filename, data=data, n=n))
-		else:
-			flash('Allowed file types are xlsx and xls')
-			return redirect(request.url)
+	# option 2 using FileReader on JS side
+	# file_binary = request.form.get('body')
+	# tmpdict = {'filename': filename, 'binary': file_binary, 'task': task_type, 'n': num_neighbors}
 
-@app.route('/model/<filename>/<data>/<n>', methods=['GET', 'POST'])
-def model(filename, data, n):
-	if request.method == 'GET':
+	file = request.files['file']
+	filename = secure_filename(file.filename)
+	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-		df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-		clean = df.loc[df.Indication.notnull()]
-		unclean = df.loc[df.Indication.isnull()]
+	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	clean = df.loc[df.Indication.notnull()]
+	unclean = df.loc[df.Indication.isnull()]
 
-		colnames = list(clean.columns)
-		coltype = None
-		neighborhood = None
+	colnames = list(clean.columns)
+	coltype = None
+	neighborhood = None
 
-		if data == 'indication':
-			from indication_model import get_indication_dictionary
-			
-			coltype = 'Tumor'
-			neighborhood = get_indication_neighbors(clean, unclean, int(n))
-		else if data == 'drug':
-			print('do something else')
+	if task_type == 'indication':
+		from indication_model import get_indication_neighbors
+		coltype = 'Tumor'
+		neighborhood = get_indication_neighbors(clean, unclean, int(num_neighbors))
+	elif task_type == 'drug':
+		print('do something else')
 
-		recommendations = get_recommendation_dict(clean, unclean, neighborhood, coltype)
+	recommendations = get_recommendation_dict(clean, unclean, neighborhood)
+	# add addition keys to dictionary
+	recommendations['columnType'] = coltype
+	recommendations['columnHead'] = colnames
+	recommendations['filename'] = filename
+	return jsonify(**recommendations)
+
+
+# @app.route('/api/download', method=['POST'])
+# def download_file():
+	
+# 	labeled_json = request.get_json()
+# 	labeled_dict = json.loads(labeled_json)
+# 	filename = labeled_dict['filename']
+# 	sheetname = None
+# 	if labeled_dict['columnType'] == 'Tumor':
+# 		sheename = 'Indication_Dictionary'
+
+# 	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+# 	clean = df.loc[df.Indication.notnull()]
+
+# 	export_results = {'entry': [], 'type': [], 'subtype': []}
+# 	for entry in labeled_dict['conditions']:
+# 		for det in entry['details']:
+# 			export_results['entry'].append(entry['entry'])
+# 			export_results['type'].append(det['type'])
+# 			export_results['subtype'].append(det['subtype'])
+	
+# 	newly_cleaned = pd.DataFrame(export_results)
+# 	newly_cleaned.columns = labeled_dict['columnHead']
+# 	export_table = pd.concat([newly_cleaned, clean], ignore_index=True, sort=False)
+
+# 	output = BytesIO()
+# 	writer = pd.ExcelWriter(output, engine='xlsxwriter')
+# 	export_table.to_excel(writer, index=False, sheet_name=sheetname)
+# 	workbook = writer.book
+# 	worksheet = writer.sheets[sheetname]
+
+# 	writer.close()
+
+# 	output.seek(0)
+
+# 	root, ext = filename.split('.')
+# 	new_filename = root + '_completed.' + ext
+# 	return send_file(output, attachment_filename=new_filename, as_attachment=True)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port='5000', debug=True)  # debug=True
