@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   card: {
-    maxWidth: "800px",
+    maxWidth: "400px",
     //textAlign: 'center',
     justifyContent: 'center',
     alignContent: 'center',
@@ -34,8 +34,43 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function UploadCard() {
+export default function DownloadCard( { payload } ) {
   const classes = useStyles();
+
+  const [loadingState, setLoadingState] = React.useState(false);
+
+  function handleDownload(event) {
+    setLoadingState(true);
+
+    let payloadJson = JSON.stringify(payload);
+    let filename = payload.filename
+    let filenameText = filename.split('.')
+    let newName = `${filenameText[0]}_completed.${filenameText[1]}`
+
+    console.log(JSON.stringify(payload, false, 2));
+    console.log(newName); 
+
+    let url = 'http://localhost:5000/api/download';
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: payloadJson
+    })
+      .then(response => response.blob())
+      .then(blob => {
+        let bloburl = window.URL.createObjectURL(blob);
+        let a = document.createElement('a'); 
+        a.href = bloburl;
+        a.download = newName;
+        document.body.appendChild(a);
+        a.click();
+        setLoadingState(false);
+        a.remove();
+      });
+  }
+
 
   return (
     <Grid
@@ -46,14 +81,12 @@ export default function UploadCard() {
     >
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBttom variant="h5" component="h2" className={classes.head}><strong>Download</strong></Typography>
+          <Typography gutterBttom variant="h5" component="h2" className={classes.head}><strong>Download File</strong></Typography>
           <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-            Success! Your file has been written. 
+            Success! The new labels have been added to your original file. Please click download to write and save your file.
           </Typography>
-          <p>filename_QCed.xlsx</p>
-          <Button variant="contained" color="primary" fullWidth={true} className={classes.button}>
-            <ArrowDownwardIcon className={classes.leftIcon} />
-              &nbsp; Download
+          <Button variant="contained" color="primary" fullWidth={true} className={classes.button} onClick={handleDownload}>
+            {loadingState ? <div>Downloading...</div> : <div>Download</div>}
           </Button>
         </CardContent>
       </Card>

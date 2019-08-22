@@ -8,6 +8,7 @@ import operator
 import json
 import logging
 from io import BytesIO
+import xlsxwriter
 from collections import Counter
 from formatter import get_recommendation_dict
 
@@ -28,19 +29,18 @@ def upload_file():
 	task_type = request.args.get('tasktype')
 	num_neighbors = request.args.get('numneighbors')
 
-	# option 2 using FileReader on JS side
-	# file_binary = request.form.get('body')
-	# tmpdict = {'filename': filename, 'binary': file_binary, 'task': task_type, 'n': num_neighbors}
-
 	file = request.files['file']
 	filename = secure_filename(file.filename)
 	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-	clean = df.loc[df.Indication.notnull()]
-	unclean = df.loc[df.Indication.isnull()]
+	colnames = list(df.columns)
+	df.columns = ['support', 'type', 'subtype']
+	clean = df.loc[df.type.notnull()]
+	clean.columns = colnames
+	unclean = df.loc[df.type.isnull()]
+	unclean.columns = colnames
 
-	colnames = list(clean.columns)
 	coltype = None
 	neighborhood = None
 
@@ -59,44 +59,51 @@ def upload_file():
 	return jsonify(**recommendations)
 
 
-# @app.route('/api/download', method=['POST'])
-# def download_file():
+@app.route('/api/download', methods=['POST'])
+def download_file():
+	data = request.data
+	data.decode()
+	labeled_dict = json.loads(data)
+
+	filename = labeled_dict['filename']
+	sheetname = None
+	if labeled_dict['columnType'] == 'Tumor':
+		sheetname = 'Indication_Dictionary'
+	elif labeled_dict['columnType'] == 'Drug':
+		sheetname = 'Drug_Dictionary'
+
+	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	df.columns = ['support', 'type', 'subtype']
+	clean = df.loc[df.type.notnull()]
+
+	export_results = {'entry': [], 'type': [], 'subtype': []}
+	for entry in labeled_dict['conditions']:
+		for det in entry['details']:
+			if det['isSelected'] == True:
+				export_results['entry'].append(entry['entry'])
+				export_results['type'].append(det['type'])
+				export_results['subtype'].append(det['subtype'])
 	
-# 	labeled_json = request.get_json()
-# 	labeled_dict = json.loads(labeled_json)
-# 	filename = labeled_dict['filename']
-# 	sheetname = None
-# 	if labeled_dict['columnType'] == 'Tumor':
-# 		sheename = 'Indication_Dictionary'
+	newly_cleaned = pd.DataFrame(export_results)
+	newly_cleaned.columns = labeled_dict['columnHead']
+	clean.columns = labeled_dict['columnHead']
+	export_table = pd.concat([newly_cleaned, clean], ignore_index=True, sort=False)
+	export_length = len(export_table)
 
-# 	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-# 	clean = df.loc[df.Indication.notnull()]
+	output = BytesIO()
+	writer = pd.ExcelWriter(output, engine='xlsxwriter')
+	export_table.to_excel(writer, index=False, sheet_name=sheetname)
+	workbook = writer.book
+	worksheet = writer.sheets[sheetname]
 
-# 	export_results = {'entry': [], 'type': [], 'subtype': []}
-# 	for entry in labeled_dict['conditions']:
-# 		for det in entry['details']:
-# 			export_results['entry'].append(entry['entry'])
-# 			export_results['type'].append(det['type'])
-# 			export_results['subtype'].append(det['subtype'])
-	
-# 	newly_cleaned = pd.DataFrame(export_results)
-# 	newly_cleaned.columns = labeled_dict['columnHead']
-# 	export_table = pd.concat([newly_cleaned, clean], ignore_index=True, sort=False)
+	writer.close()
 
-# 	output = BytesIO()
-# 	writer = pd.ExcelWriter(output, engine='xlsxwriter')
-# 	export_table.to_excel(writer, index=False, sheet_name=sheetname)
-# 	workbook = writer.book
-# 	worksheet = writer.sheets[sheetname]
+	output.seek(0)
 
-# 	writer.close()
-
-# 	output.seek(0)
-
-# 	root, ext = filename.split('.')
-# 	new_filename = root + '_completed.' + ext
-# 	return send_file(output, attachment_filename=new_filename, as_attachment=True)
+	root, ext = filename.split('.')
+	new_filename = root + '_completed.' + ext
+	return send_file(output, attachment_filename=new_filename, as_attachment=True)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='5000', debug=True)  # debug=True
+    app.run(host='0.0.0.0', port='5000', debug=True)

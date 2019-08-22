@@ -7,3 +7,4 @@ scikit-learn==0.21.3
 sklearn==0.0
 Werkzeug==0.15.5
 xlrd==1.2.0
+XlsxWriter==1.1.9
