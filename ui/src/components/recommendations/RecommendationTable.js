@@ -44,8 +44,8 @@ export default function RecommendationTable(props) {
 
   function handleFinish(event) {
     props.conditions[props.conditionIndex].details = rows.map(row => row.details);
-    // setIsFinishedLabeling props?
-    console.log(JSON.stringify(props.conditions, false, 2));
+    //console.log(JSON.stringify(props.conditions, false, 2));
+    props.setIsFinishedLabeling();
   }
 
   function handleBack(event) {

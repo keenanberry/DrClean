@@ -40,7 +40,7 @@ export default function UploadCard({ payload, setHasUploadedFile }) {
     >
       <Card className={classes.card}>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="h2" className={classes.head}><strong>Upload</strong></Typography>
+          <Typography gutterBottom variant="h5" component="h2" className={classes.head}><strong>Upload File</strong></Typography>
           <Typography variant="subtitle1" color="textSecondary" gutterBottom>
             Please upload your file.
           </Typography>

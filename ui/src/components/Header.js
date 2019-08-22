@@ -54,6 +54,7 @@ export default function Header(props) {
           className={classes.homeButton}
           color="inherit"
           aria-label="menu"
+          onClick={handleSetToUploadStep}
         >
           <HomeIcon />
         </IconButton>

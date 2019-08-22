@@ -2,10 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
-//import Fab from '@material-ui/core/Fab';
 import Button from '@material-ui/core/Button';
-//import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-//import NavigationIcon from '@material-ui/icons/Navigation';
 import axios from 'axios';
 
 const dataTypes = [
@@ -33,7 +30,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-//export default function UploadForm({ payload, setConditions, setColumnType, setHasUploadedFile }) {
 export default function UploadForm({ payload, setHasUploadedFile }) {
   const classes = useStyles();
   const fileInput = React.createRef();
@@ -43,14 +39,20 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
     numneighbors: '',
   });
 
+  const [loadingState, setLoadingState] = React.useState(false);
+  const [submitButtonColor, setSubmitButtonColor] = React.useState('primary')
+
   const handleInputChange = name => event => {
     setTextValues({ ...textValues, [name]: event.target.value });
   };
 
   function handleUpload(event) {
     event.preventDefault();
-
-    if (fileInput.current.files[0]) {
+    if (textValues.tasktype === '') {
+      alert('You must indicate the file type!')
+    }else if (textValues.numneighbors == '') {
+      alert('You must select a number!')
+    }else if (fileInput.current.files[0]) {
       var queryString = Object.keys(textValues)
         .map(key => key + '=' + textValues[key])
         .join('&');
@@ -60,6 +62,8 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
       const data = new FormData();
       data.append('file', fileInput.current.files[0]);
 
+      setLoadingState(true)
+      setSubmitButtonColor('secondary')
       fetch(url, {
         method: 'POST',
         body: data,
@@ -68,9 +72,6 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
         })
         .then((response) => {
           let responseJson = JSON.parse(response);
-          //console.log(responseJson);
-          //setConditions(responseJson.conditions);
-          //setColumnType(responseJson.columnType);
           payload.conditions = responseJson.conditions;
           payload.columnType = responseJson.columnType;
           payload.columnHead = responseJson.columnHead;
@@ -84,22 +85,6 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
     }else {
       alert('Please upload your file!');
     }
-      // option 2 uses FileReader() ... doesn't work
-      // let files = fileInput.current.files;
-      // let reader = new FileReader();
-      // reader.readAsBinaryString(files[0]);
-
-      // reader.onload = (e) => {
-      //   console.log(e.target.result)
-      //   const url = `http://localhost:5000/api/upload?${queryString}`;
-      //   console.log(url)
-      //   const body={file:e.target.result}
-      //   return axios.post(url, body)
-      //     .then(response => console.log('SUCCESS!'))
-      //     .catch(response => console.log('FAIL!'))
-      // }
-
-    
   }
 
   return (
@@ -158,8 +143,8 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
           />
         </div>
         <div className="row">
-          <Button form="upload-form" type="submit" variant="contained" color="primary" fullWidth={true} onClick={handleUpload}>
-            Submit
+          <Button form="upload-form" type="submit" variant="contained" color={submitButtonColor} fullWidth={true} onClick={handleUpload}>
+          {loadingState ? <div>Loading...this may take a minute</div> : <div>Submit</div>}
           </Button>
         </div>
       </div>
