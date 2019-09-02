@@ -1,9 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-//import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-//import CardHeader from '@material-ui/core/CardHeader';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import UploadForm from './UploadForm'
@@ -26,7 +24,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-//export default function UploadCard({ payload, setConditions, setColumnType, setHasUploadedFile }) {
 export default function UploadCard({ payload, setHasUploadedFile }) {
 
   const classes = useStyles();
@@ -47,8 +44,6 @@ export default function UploadCard({ payload, setHasUploadedFile }) {
           <UploadForm 
             payload={payload}
             setHasUploadedFile={setHasUploadedFile}
-            //setConditions={setConditions}
-            //setColumnType={setColumnType}
           />
         </CardContent>
       </Card>

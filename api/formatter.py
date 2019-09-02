@@ -9,8 +9,6 @@ def get_recommendation_dict(clean, unclean, neighborhood):
     clean.reset_index(inplace=True)
     clean.drop(columns='index', inplace=True)
     clean.fillna('',inplace=True)
-
-    clean.columns = ['support', 'type', 'subtype']
     unclean.columns = ['entry', 'type', 'subtype']
 
     data = dict()

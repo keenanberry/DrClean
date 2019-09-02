@@ -1,12 +1,9 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-//import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-//import CardHeader from '@material-ui/core/CardHeader';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import Button from '@material-ui/core/Button';
 
 
@@ -37,18 +34,23 @@ const useStyles = makeStyles(theme => ({
 export default function DownloadCard( { payload } ) {
   const classes = useStyles();
 
-  const [loadingState, setLoadingState] = React.useState(false);
+  const [submitLoadingState, setSubmitLoadingState] = React.useState({
+    text: 'Download',
+    buttonColor: 'primary'
+  })
 
   function handleDownload(event) {
-    setLoadingState(true);
+    event.preventDefault();
+
+    setSubmitLoadingState({
+      text: 'Downloading...',
+      buttonColor: 'default'
+    })
 
     let payloadJson = JSON.stringify(payload);
     let filename = payload.filename
     let filenameText = filename.split('.')
     let newName = `${filenameText[0]}_completed.${filenameText[1]}`
-
-    console.log(JSON.stringify(payload, false, 2));
-    console.log(newName); 
 
     let url = 'http://localhost:5000/api/download';
     fetch(url, {
@@ -66,12 +68,22 @@ export default function DownloadCard( { payload } ) {
         a.download = newName;
         document.body.appendChild(a);
         a.click();
-        setLoadingState(false);
+        setSubmitLoadingState({
+          text: 'Download',
+          buttonColor: 'primary'
+        })
         a.remove();
+      })
+      .catch((error) => {
+        setSubmitLoadingState({
+          text: 'Error!',
+          buttonColor: 'secondary'
+        })
+        alert('Oops! Something went wrong.')
+        console.error(error);
       });
   }
-
-
+  
   return (
     <Grid
       container
@@ -85,8 +97,8 @@ export default function DownloadCard( { payload } ) {
           <Typography variant="subtitle1" color="textSecondary" gutterBottom>
             Success! The new labels have been added to your original file. Please click download to write and save your file.
           </Typography>
-          <Button variant="contained" color="primary" fullWidth={true} className={classes.button} onClick={handleDownload}>
-            {loadingState ? <div>Downloading...</div> : <div>Download</div>}
+          <Button variant="contained" color={submitLoadingState.buttonColor} fullWidth={true} className={classes.button} onClick={handleDownload}>
+            {submitLoadingState.text}
           </Button>
         </CardContent>
       </Card>

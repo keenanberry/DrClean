@@ -1,16 +1,16 @@
 import React from 'react';
 import TableBody from '@material-ui/core/TableBody';
-import { randomBytes } from 'crypto';
 
 import RecommendationRow from './RecommendationRow';
 
 export default function RecommendationTableBody({
   rows,
-  rowKeyPrefix
+  rowKeyPrefix,
+  columnType
 }) {
   return (
     <TableBody>
-      {rows.map((props, idx) => (<RecommendationRow {...props} key={rowKeyPrefix + idx.toString()}/>))}
+      {rows.map((props, idx) => (<RecommendationRow {...props} key={rowKeyPrefix + idx.toString()} columnType={columnType} />))}
     </TableBody>
   );
 }
