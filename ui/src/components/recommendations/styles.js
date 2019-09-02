@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 export const useStyles = makeStyles(theme => ({
     root: {
         width: '80%',
+        height: 800,
         marginTop: theme.spacing(3),
         overflowX: 'auto',
     },
@@ -29,4 +30,7 @@ export const useStyles = makeStyles(theme => ({
         backgroundColor: 'orange',
         color: theme.palette.common.white,
     },
+    right: {
+        textAlign: "right", 
+    }, 
 }));

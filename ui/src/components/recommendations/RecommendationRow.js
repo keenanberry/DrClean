@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import clsx from 'clsx';
 import Table from '@material-ui/core/Table';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
+//import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
-import { randomBytes } from 'crypto';
+import IntegrationAutosuggest from '../autoSuggestions/AutosuggestFields';
 
 import { useStyles } from './styles';
 
-export default function RecommendationRow({ id, details, key }) {
+export default function RecommendationRow({ id, details, key, columnType }) {
     const [isSelected, setIsSelected] = useState(details.isSelected);
     const [type, setType] = useState(details.type);
     const [subtype, setSubtype] = useState(details.subtype);
-    const classes = useStyles();
+    const classes = useStyles(); 
 
     details.isSelected = isSelected;
     details.type = type;
@@ -40,27 +39,19 @@ export default function RecommendationRow({ id, details, key }) {
             </Table>
         </TableCell>
         <TableCell align="center">
-            {details.isManualInput ? <TextField
-                id="outlined-dense"
-                label={`Enter type`}
-                className={clsx(classes.textField, classes.dense)}
-                defaultValue={type}
-                margin="dense"
-                variant="outlined"
-                onClick={event => event.stopPropagation()}
-                onChange={event => setType(event.target.value)}
+            {details.isManualInput ? <IntegrationAutosuggest
+                labelId={`typeMain`}
+                typeId={columnType}
+                textField={type}
+                setTextField={setType}
             /> : type}
         </TableCell>
         <TableCell align="center">
-            {details.isManualInput ? <TextField
-                id="outlined-dense"
-                label={`Enter subtype`}
-                className={clsx(classes.textField, classes.dense)}
-                defaultValue={subtype}
-                margin="dense"
-                variant="outlined"
-                onClick={event => event.stopPropagation()}
-                onChange={event => setSubtype(event.target.value)}
+            {details.isManualInput ? <IntegrationAutosuggest
+                labelId={`typeSub`}
+                typeId={columnType}
+                textField={subtype}
+                setTextField={setSubtype}
             /> : subtype}
         </TableCell>
         <TableCell align="center" padding="checkbox">

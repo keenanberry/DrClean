@@ -29,7 +29,7 @@ export default function RecommendationTableFooter({
         </TableCell>
         <TableCell></TableCell>
         <TableCell></TableCell>
-        <TableCell>
+        <TableCell className={classes.right}>
           {
             isLastPage
             ? <Button type="submit" variant="contained" component="span" className={classes.foot} onClick={handleFinish}>Finish</Button>

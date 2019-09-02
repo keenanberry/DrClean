@@ -37,9 +37,7 @@ def upload_file():
 	colnames = list(df.columns)
 	df.columns = ['support', 'type', 'subtype']
 	clean = df.loc[df.type.notnull()]
-	clean.columns = colnames
 	unclean = df.loc[df.type.isnull()]
-	unclean.columns = colnames
 
 	coltype = None
 	neighborhood = None
@@ -49,7 +47,11 @@ def upload_file():
 		coltype = 'Tumor'
 		neighborhood = get_indication_neighbors(clean, unclean, int(num_neighbors))
 	elif task_type == 'drug':
-		print('do something else')
+		from drug_model import get_drug_neighbors
+		coltype = 'Drug'
+		# reassign clean for drug data because search_terms 
+			# are used to augment existing data
+		neighborhood, clean = get_drug_neighbors(clean, unclean, int(num_neighbors))
 
 	recommendations = get_recommendation_dict(clean, unclean, neighborhood)
 	# add addition keys to dictionary
@@ -73,11 +75,13 @@ def download_file():
 		sheetname = 'Drug_Dictionary'
 
 	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-	df.columns = ['support', 'type', 'subtype']
+	df.columns = ['entry', 'type', 'subtype']
 	clean = df.loc[df.type.notnull()]
 
 	export_results = {'entry': [], 'type': [], 'subtype': []}
 	for entry in labeled_dict['conditions']:
+		# 'conditions' is used for all classification tasks 
+			# because it's used in the js code
 		for det in entry['details']:
 			if det['isSelected'] == True:
 				export_results['entry'].append(entry['entry'])
@@ -85,14 +89,14 @@ def download_file():
 				export_results['subtype'].append(det['subtype'])
 	
 	newly_cleaned = pd.DataFrame(export_results)
-	newly_cleaned.columns = labeled_dict['columnHead']
-	clean.columns = labeled_dict['columnHead']
+
 	export_table = pd.concat([newly_cleaned, clean], ignore_index=True, sort=False)
-	export_length = len(export_table)
+	export_table.columns = labeled_dict['columnHead']
 
 	output = BytesIO()
 	writer = pd.ExcelWriter(output, engine='xlsxwriter')
 	export_table.to_excel(writer, index=False, sheet_name=sheetname)
+	# necessary ?
 	workbook = writer.book
 	worksheet = writer.sheets[sheetname]
 

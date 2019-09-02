@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import axios from 'axios';
 
 const dataTypes = [
     {
@@ -39,8 +38,10 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
     numneighbors: '',
   });
 
-  const [loadingState, setLoadingState] = React.useState(false);
-  const [submitButtonColor, setSubmitButtonColor] = React.useState('primary')
+  const [submitLoadingState, setSubmitLoadingState] = React.useState({
+    text: 'Submit',
+    buttonColor: 'primary'
+  })
 
   const handleInputChange = name => event => {
     setTextValues({ ...textValues, [name]: event.target.value });
@@ -50,9 +51,14 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
     event.preventDefault();
     if (textValues.tasktype === '') {
       alert('You must indicate the file type!')
-    }else if (textValues.numneighbors == '') {
+    }else if (textValues.numneighbors === '') {
       alert('You must select a number!')
     }else if (fileInput.current.files[0]) {
+      setSubmitLoadingState({
+        text: 'Loading...this may take a minute',
+        buttonColor: 'default'
+      })
+
       var queryString = Object.keys(textValues)
         .map(key => key + '=' + textValues[key])
         .join('&');
@@ -62,8 +68,6 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
       const data = new FormData();
       data.append('file', fileInput.current.files[0]);
 
-      setLoadingState(true)
-      setSubmitButtonColor('secondary')
       fetch(url, {
         method: 'POST',
         body: data,
@@ -80,6 +84,11 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
           setHasUploadedFile();
         })
         .catch((error) => {
+          setSubmitLoadingState({
+            text: 'Error!',
+            buttonColor: 'secondary'
+          })
+          alert('ERROR! Please check that your file is formatted correctly.')
           console.error(error);
         });
     }else {
@@ -143,8 +152,8 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
           />
         </div>
         <div className="row">
-          <Button form="upload-form" type="submit" variant="contained" color={submitButtonColor} fullWidth={true} onClick={handleUpload}>
-          {loadingState ? <div>Loading...this may take a minute</div> : <div>Submit</div>}
+          <Button form="upload-form" type="submit" variant="contained" color={submitLoadingState.buttonColor} fullWidth={true} onClick={handleUpload}>
+            {submitLoadingState.text}
           </Button>
         </div>
       </div>

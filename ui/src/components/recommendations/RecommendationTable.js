@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import Table from '@material-ui/core/Table';
 
 import RecommendationTableHeader from './RecommendationTableHeader';
@@ -59,7 +59,9 @@ export default function RecommendationTable(props) {
       id: rows.length,
       details: {
         isManualInput: true,
-        isSelected: true
+        isSelected: true,
+        type: "",
+        subtype: ""
       }
     }]);
   }
@@ -67,7 +69,7 @@ export default function RecommendationTable(props) {
   return (
     <Table className={classes.table}>
       <RecommendationTableHeader columnType={props.columnType} />
-      <RecommendationTableBody rows={rows} rowKeyPrefix={'RecRow_' + props.conditions[props.conditionIndex].entry}/>
+      <RecommendationTableBody rows={rows} rowKeyPrefix={'RecRow_' + props.conditions[props.conditionIndex].entry} columnType={props.columnType}/>
       <RecommendationTableFooter
         handleAddRow={handleAddRow}
         handleNext={handleNext}
