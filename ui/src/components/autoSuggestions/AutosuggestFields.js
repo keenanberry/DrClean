@@ -116,6 +116,8 @@ export default function IntegrationAutosuggest({
   var placeholderText = '';
   let autoSelectData = null;
 
+  // ** if more classification tasks are added to app ... 
+  // it is recommended to change conditional statements below to Swtich clause
   if (typeId === "Tumor") {
     if (labelId === "typeMain") {
       fieldLabelText = "Tumor Type";
