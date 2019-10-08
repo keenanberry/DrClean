@@ -1,4 +1,4 @@
-# KantarClean
+# dbClean
 Recommendation app for monthly cleaning of pharmaceutical database.
 
 ## UI
