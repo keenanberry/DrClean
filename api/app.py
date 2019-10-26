@@ -23,7 +23,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/api/upload', methods=['POST'])
+@app.route('/api/upload', methods=['GET','POST','OPTIONS'])
 def upload_file():
 	
 	task_type = request.args.get('tasktype')
@@ -32,6 +32,7 @@ def upload_file():
 	file = request.files['file']
 	filename = secure_filename(file.filename)
 	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	print('filename is', filename)
 
 	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 	colnames = list(df.columns)
@@ -42,6 +43,7 @@ def upload_file():
 	coltype = None
 	neighborhood = None
 
+	print('entering model...')
 	if task_type == 'indication':
 		from indication_model import get_indication_neighbors
 		coltype = 'Tumor'
@@ -52,12 +54,14 @@ def upload_file():
 		# reassign clean for drug data because search_terms 
 			# are used to augment existing data
 		neighborhood, clean = get_drug_neighbors(clean, unclean, int(num_neighbors))
-
+	
+	print('neighborhood has been returned... heres an example distance:', neighborhood[0][0])
 	recommendations = get_recommendation_dict(clean, unclean, neighborhood)
 	# add addition keys to dictionary
 	recommendations['columnType'] = coltype
 	recommendations['columnHead'] = colnames
 	recommendations['filename'] = filename
+	print('recommendation dictionary length is...', len(recommendations))
 	return jsonify(**recommendations)
 
 
@@ -110,4 +114,4 @@ def download_file():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='5000', debug=True)
+    app.run(host='0.0.0.0', port=5000)

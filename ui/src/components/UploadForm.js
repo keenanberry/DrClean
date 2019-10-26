@@ -63,7 +63,9 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
         .map(key => key + '=' + textValues[key])
         .join('&');
 
-      const url = `http://localhost:5000/api/upload?${queryString}`;
+      //const url = `http://localhost:5000/api/upload?${queryString}`;
+      const baseUrl = process.env.NODE_ENV === 'LOCAL' ? 'http://localhost:5000' : 'https://kantarclean.azurewebsites.net';
+      const url = `${baseUrl}/api/upload?${queryString}`;
 
       const data = new FormData();
       data.append('file', fileInput.current.files[0]);
@@ -75,6 +77,7 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
           return response.text();
         })
         .then((response) => {
+          //console.log(response);
           let responseJson = JSON.parse(response);
           payload.conditions = responseJson.conditions;
           payload.columnType = responseJson.columnType;
