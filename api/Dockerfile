@@ -1,4 +1,4 @@
-FROM python:slim
+FROM python:3.7-slim
 
 # set working directory
 COPY ./requirements.txt /app/requirements.txt
