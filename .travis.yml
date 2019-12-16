@@ -13,7 +13,7 @@ services:
 #   - sudo mv docker-compose /usr/local/bin
 
 script:
-  - docker-compose up -d --build
+  - docker-compose up -d
 
 after_script:
   - docker-compose down
