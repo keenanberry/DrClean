@@ -10,7 +10,6 @@ A collaborative filtering method is used to generate label suggestions for uncle
 # Product Name
 > Short blurb about what your product does.
 
-[![NPM Version][docker-image]][docker-url]
 [![Build Status][travis-image]][https://travis-ci.com/keenanberry/dbClean]
 
 One to two paragraph statement about your product and what it does.
