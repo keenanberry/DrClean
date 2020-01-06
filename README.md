@@ -32,7 +32,7 @@ docker-compose down
 ## Usage example
 
 A few motivating and useful examples of how your product can be used. Spice this up with code blocks and potentially more screenshots.
-![](add-other.gif)
+![](upload)
 _For more examples and usage, please refer to the [Wiki][wiki]._
 
 
