@@ -29,13 +29,21 @@ When finished...
 docker-compose down
 ```
 
-## Usage example
+## Usage examples and info
+
+The following screenshot displays the upload (home) page. The user should first upload a correctly formatted excel file, next the user needs to select the classification task: "tumor" or "drug." Then the user should select the number of nearest neighbors to display in the labelling component of this application (5-11 is recommended). Click "submit" to begin labelling the unclean entries.
 
 ![](demo/upload.png)
 
+If the model does not display the correct label and sublabel, the user can click the "Add Other" button on the bottom left of the table component. This will add a row to the table in which the user may type the correct laebl/sublabel. Note that the text box components have an autoselect feature which shows the entries that match what the user has begun typing.
+
 ![](demo/add-other.gif)
 
+During the labelling section of this app, the user can navigate forwards and backwards to double check or correct previous label assignments. However, once the user reaches the final entry the "next" button changes to "finish." Upon clicking the "finish" button all labels will be saved according to their current state. 
+
 ![](demo/forward-back.gif)
+
+After clicking "finish" the user will be prompted with the download page. Click "download" to write the new labels to the original excel file that was uploaded.
 
 ![](demo/download.png)
 
