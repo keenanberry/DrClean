@@ -2,26 +2,19 @@ version: '3.7'
 
 services:
   kantar-clean-ui:
+    image: keenanberry/kantar-clean-ui-prod:2.4
     container_name: kantar-clean-ui
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    volumes:
-      - './ui:/app'
-      - '/app/node_modules'
+    restart: always
     ports:
-      - '3000:3000'
+      - '80:80'
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=production
+      - API_URI=https://kantarclean.azurewebsites.net
+      #- CHOKIDAR_USEPOLLING=true
   kantar-clean-api:
+    image: keenanberry/kantar-clean-api-prod:1.4
     container_name: kantar-clean-api
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    volumes:
-      - './api:/app'
-      - '/app/node_modules'
+    restart: always
     ports:
       - '5000:5000'
     # environment:
