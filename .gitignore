@@ -1,5 +1,6 @@
 # IDEs
 .vscode
-/api/uploads/*
+/api/uploads/*.xls
+/api/uploads/*.xlsx
 /sample_data/*
 /api/__pycache__
