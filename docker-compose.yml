@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   kantar-clean-ui:
-    image: keenanberry/kantar-clean-ui-prod:2.4
+    image: keenanberry/kantar-clean-ui-prod:3.0
     container_name: kantar-clean-ui
     restart: always
     ports:
@@ -12,7 +12,7 @@ services:
       - API_URI=https://kantarclean.azurewebsites.net
       #- CHOKIDAR_USEPOLLING=true
   kantar-clean-api:
-    image: keenanberry/kantar-clean-api-prod:1.4
+    image: keenanberry/kantar-clean-api-prod:2.0
     container_name: kantar-clean-api
     restart: always
     ports:
