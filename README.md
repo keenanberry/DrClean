@@ -15,7 +15,18 @@ An interactive table interface is used to present recommendations to the user. T
 
 [Install Docker](https://docs.docker.com/v17.09/engine/installation/)
 
-OS X & Linux & Windows:
+OS X & Linux:
+
+```sh
+git clone https://github.com/keenanberry/dbClean.git
+cd dbClean
+docker-compose up -d
+```
+
+Windows:
+
+For Windows users, please note the "System Requirements" section at the following page: https://docs.docker.com/docker-for-windows/install/
+Since the compose uses mounted volumes, you'll also need to create a new Windows environment variable `COMPOSE_CONVERT_WINDOWS_PATHS` and set the variable value to `1`. Then you should be able to run the commands below.
 
 ```sh
 git clone https://github.com/keenanberry/dbClean.git
