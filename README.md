@@ -26,6 +26,7 @@ docker-compose up -d
 Windows:
 
 For Windows users, please note the "System Requirements" section at the following page: https://docs.docker.com/docker-for-windows/install/
+
 Since the compose uses mounted volumes, you'll also need to create a new Windows environment variable `COMPOSE_CONVERT_WINDOWS_PATHS` and set the variable value to `1`. Then you should be able to run the commands below.
 
 ```sh
