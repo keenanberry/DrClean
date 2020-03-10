@@ -17,5 +17,6 @@ services:
     restart: always
     ports:
       - '5000:5000'
-    # environment:
-      # Any Python environment variables go here
+    environment:
+      - ACCOUNT_NAME=<youraccountname>
+      - ACCOUNT_KEY=<youraccountkey>

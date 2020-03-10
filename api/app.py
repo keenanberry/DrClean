@@ -1,8 +1,12 @@
-import os, sys
+import os, uuid, sys
 import urllib.request
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
+from azure.storage.blob import BlockBlobService
+from azure.storage.blob.baseblobservice import BaseBlobService
+from azure.storage.blob import BlobPermissions
+from datetime import datetime, timedelta
 import pandas as pd
 import operator
 import json
@@ -12,13 +16,16 @@ import xlsxwriter
 from collections import Counter
 from formatter import get_recommendation_dict
 
-UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = set(['xlsx', 'xls'])
+# blob service parameters
+ACCOUNT = os.getenv('ACCOUNT_NAME')
+KEY = os.getenv('ACCOUNT_KEY')
+CONTAINER = 'uploads'
+# blob service
+BLOB = BlockBlobService(account_name=ACCOUNT, account_key=KEY)
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -31,10 +38,20 @@ def upload_file():
 
 	file = request.files['file']
 	filename = secure_filename(file.filename)
-	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-	print('filename is', filename)
+	file.seek(0)
+	# upload excel file to azure blob storage
+	BLOB.create_blob_from_stream(CONTAINER, filename, file)
 
-	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	sas_token = BLOB.generate_blob_shared_access_signature(
+		CONTAINER, 
+		filename, 
+		permission=BlobPermissions.READ, 
+		expiry=datetime.utcnow() + timedelta(hours=1)
+	)
+	# make blob readable from pandas read_excel method
+	blob_url_with_sas = BLOB.make_blob_url(CONTAINER, filename, sas_token=sas_token)
+
+	df = pd.read_excel(blob_url_with_sas)
 	colnames = list(df.columns)
 	df.columns = ['support', 'type', 'subtype']
 	clean = df.loc[df.type.notnull()]
@@ -78,7 +95,16 @@ def download_file():
 	elif labeled_dict['columnType'] == 'Drug':
 		sheetname = 'Drug_Dictionary'
 
-	df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	sas_token = BLOB.generate_blob_shared_access_signature(
+		CONTAINER, 
+		filename, 
+		permission=BlobPermissions.READ, 
+		expiry=datetime.utcnow() + timedelta(hours=1)
+	)
+	# make blob readable from pandas read_excel method
+	blob_url_with_sas = BLOB.make_blob_url(CONTAINER, filename, sas_token=sas_token)
+
+	df = pd.read_excel(blob_url_with_sas)
 	df.columns = ['entry', 'type', 'subtype']
 	clean = df.loc[df.type.notnull()]
 

@@ -2,3 +2,6 @@
 .vscode
 api/uploads/*.xls
 api/uploads/*.xlsx
+sample_data
+/api/__pycache__
+/ui/package-lock.json
