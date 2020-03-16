@@ -53,7 +53,9 @@ export default function DownloadCard( { payload } ) {
     let newName = `${filenameText[0]}_completed.${filenameText[1]}`
 
     //let url = 'http://localhost:5000/api/download';
-    let url = process.env.NODE_ENV === 'LOCAL' ? 'http://localhost:5000/api/download' : 'https://kantarclean.azurewebsites.net/api/download';
+    let baseUrl = process.env.NODE_ENV === 'LOCAL' ? 'http://localhost:5000' : process.env.API_URI;
+    let url = `${baseUrl}/api/download`;
+    
     fetch(url, {
       method: 'POST',
       headers: {

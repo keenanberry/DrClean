@@ -64,7 +64,7 @@ export default function UploadForm({ payload, setHasUploadedFile }) {
         .join('&');
 
       //const url = `http://localhost:5000/api/upload?${queryString}`;
-      const baseUrl = process.env.NODE_ENV === 'LOCAL' ? 'http://localhost:5000' : 'https://kantarclean.azurewebsites.net';
+      const baseUrl = process.env.NODE_ENV === 'LOCAL' ? 'http://localhost:5000' : process.env.API_URI;
       const url = `${baseUrl}/api/upload?${queryString}`;
 
       const data = new FormData();

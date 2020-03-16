@@ -9,7 +9,7 @@ services:
       - '80:80'
     environment:
       - NODE_ENV=production
-      - API_URI=https://kantarclean.azurewebsites.net
+      - API_URI=http://kantarclean.azurewebsites.net
       #- CHOKIDAR_USEPOLLING=true
   kantar-clean-api:
     image: keenanberry/kantar-clean-api-prod:2.1
