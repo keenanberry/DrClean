@@ -1,4 +1,4 @@
-# dbClean
+# DrClean
 > Recommendation app for monthly cleaning of pharmaceutical database entries.
 
 [![Build Status][travis-image]][travis-url]
